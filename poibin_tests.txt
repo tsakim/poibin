@@ -1,0 +1,243 @@
+Test file for the module poibin
+================================================================================
+
+Created on Tue Mar 29, 2016
+
+Author:
+    Mika Straka
+
+Description:
+    This file contains the doctest test cases for the functions and methods
+    defined in poibin.py.
+
+Usage:
+    To run the test, execute
+        $ python -m doctest poibin_tests.txt
+    in the command line. If you want to run the tests in verbose mode, use
+        $ python -m doctest -v poibin_tests.txt
+
+    Alternatively, one can execute
+        $ python poibin.py
+    in the command line
+
+    Note that poibin.py and poibin_tests.py have to be in the same directory.
+
+################################################################################
+# Tests
+################################################################################
+
+    >>> import numpy as np
+    >>> from poibin import PoiBin
+    >>> from scipy.stats import binom
+
+# PoiBin.pmf -------------------------------------------------------------------
+
+    >>> p = [1, 1]; pb = PoiBin(p)
+    >>> pb.pmf([1, 2]).size
+    2
+
+    For equal probabilites p_j, the Poisson Binomial distribution reduces
+    to the Binomial one:
+    >>> p = [0.5, 0.5]; pb = PoiBin(p)
+    >>> bn = binom(n=2, p=p[0])
+
+    Compare to four digits behind the comma
+    >>> int(bn.pmf(0) * 10000) == int(pb.pmf(0) * 10000)
+    True
+
+    For different probabilities p_j, the Poisson Binomial distribution and
+    the Binomial distribution are different:
+    >>> pb = PoiBin([0.5, 0.8]); bn = binom(2, p=0.5)
+    >>> int(bn.pmf(0) * 10000) == int(pb.pmf(0) * 10000)
+    False
+
+    Compare results with the ones obtained with the poibin package in R
+    written by Y. Hong:
+    >>> p = [0.4163448, 0.3340270, 0.9689613]
+    >>> pb = PoiBin(p)
+    >>> pb.pmf([0, 1, 2, 3])
+    array([ 0.0120647 ,  0.39129134,  0.46189012,  0.13475384])
+    >>> p = [0.9955901, 0.5696224, 0.8272597, 0.3818746, 0.4290036,
+    ... 0.8707646, 0.8858267, 0.7557183]
+    >>> pb = PoiBin(p)
+    >>> pb.pmf([0, 2, 7, 8])
+    array([  4.17079659e-07,   2.46250608e-03,   2.02460933e-01,
+             4.48023378e-02])
+
+    Compare results with the accuracy check proposed by Y. Hong (equation 15 in
+    the reference):
+    >>> [p1, p2, p3] = np.around(np.random.random_sample(size=3), decimals = 2)
+    >>> [n1, n2, n3] = np.random.random_integers(1, 10, size=3)
+    >>> nn = n1 + n2 + n3
+    >>> l1 = [p1 for i in range(n1)]
+    >>> l2 = [p2 for i in range(n2)]
+    >>> l3 = [p3 for i in range(n3)]
+    >>> p = l1 + l2 + l3
+    >>> b1 = binom(n=n1, p=p1)
+    >>> b2 = binom(n=n2, p=p2)
+    >>> b3 = binom(n=n3, p=p3)
+    >>> k = np.random.randint(0, nn + 1)
+    >>> chi_bn = 0
+    >>> for j in range(0, k+1):
+    ...     for i in range(0, j+1):
+    ...         chi_bn += b1.pmf(i) * b2.pmf(j - i) * b3.pmf(k - j)
+    >>> pb = PoiBin(p)
+    >>> chi_pb = pb.pmf(k)
+    >>> np.around(chi_bn, decimals=10) == np.around(chi_pb, decimals=10)
+    True
+
+# PoiBin.cdf -------------------------------------------------------------------
+
+    >>> p = [1, 1]; pb = PoiBin(p)
+    >>> pb.cdf([1, 2])
+    array([ 0.,  1.])
+    >>> pb.cdf(2)
+    1.0
+
+    For equal probabilites p_j, the Poisson Binomial distribution reduces
+    to the Binomial one:
+    >>> p = [0.5, 0.5]; pb = PoiBin(p)
+    >>> from scipy.stats import binom
+    >>> bn = binom(n=2, p=p[0])
+
+    Compare to four digits behind the comma
+    >>> int(bn.cdf(0) * 10000) == int(pb.cdf(0) * 10000)
+    True
+
+    For different probabilities p_j, the Poisson Binomial distribution and
+    the Binomial distribution are different:
+    >>> pb = PoiBin([0.5, 0.8]); bn = binom(2, p=0.5)
+    >>> int(bn.cdf(0) * 10000) == int(pb.cdf(0) * 10000)
+    False
+
+    Compare results with the ones obtained with the poibin package in R
+    written by Y. Hong:
+    >>> p = [0.1, 0.1]
+    >>> pb = PoiBin(p)
+    >>> pb.cdf([0, 2])
+    array([ 0.81,  1.  ])
+    >>> p = [0.5, 1.0]
+    >>> pb = PoiBin(p)
+    >>> pb.cdf([1, 2])
+    array([ 0.5,  1. ])
+    >>> p = [0.1, 0.5]
+    >>> pb = PoiBin(p)
+    >>> pb.cdf([0, 1, 2])
+    array([ 0.45,  0.95,  1.  ])
+    >>> p = [0.1, 0.5, 0.7]
+    >>> pb = PoiBin(p)
+    >>> pb.cdf([0, 1, 2])
+    array([ 0.135,  0.6  ,  0.965])
+
+# PoiBin.pval ------------------------------------------------------------------
+
+    >>> p = [1, 1]; pb = PoiBin(p)
+    >>> np.around(pb.pval([1, 2]), decimals=2)
+    array([ 1.,  1.])
+    >>> pb.pval(2)
+    1.0
+
+    Test that the p-values of the Poisson Binomial distribution are the same
+    as the ones of the Binomial distribution when all the probabilities are
+    equal:
+    >>> pi = np.around(np.random.random_sample(), decimals = 2)
+    >>> ni = np.random.randint(5, 500)
+    >>> pp = [pi for i in range(ni)]
+    >>> bn = binom(n=ni, p=pi)
+    >>> k = np.random.randint(0, ni)
+    >>> pval_bn = 1 - bn.cdf(k) + bn.pmf(k)
+    >>> pb = PoiBin(pp)
+    >>> pval_pb = pb.pval(k)
+    >>> np.around(pval_bn, decimals=10) == np.around(pval_pb, decimals=10)
+    True
+
+# PoiBin.get_cdf ---------------------------------------------------------------
+
+    >>> p = [1, 1]; pb = PoiBin(p)
+    >>> pb.get_cdf([1, 1, 1])
+    array([ 1.,  2.,  3.])
+
+
+# PoiBin.get_pmf_xi ------------------------------------------------------------
+
+    >>> p = [0.2, 0.5]; pb = PoiBin(p)
+    >>> pb.get_pmf_xi()
+    array([ 0.4,  0.5,  0.1])
+    >>> p = [0.3, 0.8]; pb = PoiBin(p)
+    >>> pb.get_pmf_xi()
+    array([ 0.14,  0.62,  0.24])
+    >>> p = [0.3, 0.8, 0.3]; pb = PoiBin(p)
+    >>> pb.get_pmf_xi()
+    array([ 0.098,  0.476,  0.354,  0.072])
+
+# PoiBin.get_chi ---------------------------------------------------------------
+
+    >>> p = [0.2, 0.5]; pb = PoiBin(p)
+    >>> pb.get_chi(1)
+    (0.1000000000000001+0.34641016151377557j)
+    >>> pb.get_chi(2)
+    (0.099999999999999881-0.34641016151377535j)
+
+# PoiBin.get_argz_sum ----------------------------------------------------------
+
+    >>> pb = PoiBin([1, 1])
+    >>> pb.get_argz_sum(0)
+    0.0
+    >>> pb.get_argz_sum(np.pi/(2 * pb.omega))
+    3.1415926535897931
+
+# PoiBin.get_d -----------------------------------------------------------------
+
+    >>> pb = PoiBin([1, 1])
+    >>> pb.n = 1
+    >>> pb.get_d(0)
+    1.0
+
+# PoiBin.get_z -----------------------------------------------------------------
+
+    >>> pb = PoiBin([1, 1])
+    >>> pb.get_z(1, 0)
+    (1+0j)
+    >>> pb.get_z(1, np.pi / pb.omega)
+    (-1+1.2246467991473532e-16j)
+
+# PoiBin.check_rv_input --------------------------------------------------------
+
+    >>> p = [1, 1]; pb = PoiBin(p)
+    >>> pb.check_rv_input([1, 2])
+    True
+    >>> pb.check_rv_input(2)
+    True
+    >>> pb.check_rv_input(-1)
+    Traceback (most recent call last):
+    ...
+    AssertionError: Input value cannot be negative.
+    >>> pb.check_rv_input(1.7)
+    Traceback (most recent call last):
+    ...
+    AssertionError: Input value must be an integer.
+
+# PoiBin.check_xi_are_real -----------------------------------------------------
+
+    >>> pb = PoiBin([0])
+    >>> xi = np.array([1 + 0j, 1.8 + 0j], dtype=complex)
+    >>> pb.check_xi_are_real(xi)
+    True
+    >>> xi = np.array([1 + 99j, 1.8 + 0j], dtype=complex)
+    >>> pb.check_xi_are_real(xi)
+    False
+
+# PoiBin.check_input_prob ------------------------------------------------------
+
+    >>> pb = PoiBin([[1, 1], [1, 2]])
+    Traceback (most recent call last):
+    ...
+    ValueError: Input must be an one-dimensional array or a list.
+    >>> pb = PoiBin([1, -1])
+    Traceback (most recent call last):
+    ...
+    ValueError: Input probabilites have to be non negative.
+    >>> pb = PoiBin([1, 2])
+    Traceback (most recent call last):
+    ...
+    ValueError: Input probabilites have to be smaller than 1.
