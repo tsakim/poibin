@@ -14,7 +14,7 @@ The implemented methods are:
 ## Author
 Mika Straka
 
-## This Version
+### This Version
 The newest version can be found on
 [https://github.com/tsakim/poibin](https://github.com/tsakim/poibin)
 
