@@ -66,4 +66,4 @@ Computational Statistics & Data Analysis, Volume 59, March 2013, pages 41-51,
 ISSN 0167-9473](http://dx.doi.org/10.1016/j.csda.2012.10.006)
 
 ---
-Copyright (C) 2016 Mika Straka
+Copyright (c) 2016 Mika J. Straka
