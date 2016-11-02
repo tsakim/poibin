@@ -130,7 +130,7 @@ class PoiBin:
         """
         chi = np.empty(self.n + 1, dtype=complex)
         chi[0] = 1
-        half_n = self.n / 2 + self.n % 2
+        half_n = int(self.n / 2 + self.n % 2)
         # set first half of chis:
         for i in range(1, half_n + 1):
             chi[i] = self.get_chi(i)
