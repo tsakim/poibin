@@ -10,32 +10,44 @@ Author:
 
 Description:
     Implementation of the Poisson Binomial distribution as described in the
-    reference.
+    reference [Hong2013]_.
 
     Implemented method:
-        - pmf: probability mass function
-        - cdf: cumulative distribution function
-        - pval: p-value (1 - cdf)
+
+        * ``pmf``: probability mass function
+        * ``cdf``: cumulative distribution function
+        * ``pval``: p-value (1 - cdf)
 
 Usage:
-    Be p a list / numpy array of success probabilities for n non-identically
-    distributed Bernoulli random variables.
-    Create an instance of the distribution with
-        $ pb = PoiBin(p)
-    Be x a list or numpy array of different number of successes.
+    Be ``p`` a list or  NumPy array of success probabilities for ``n``
+    non-identically distributed Bernoulli random variables.
+
+    Import the module and create an instance of the distribution with::
+
+        >>> from poibin import PoiBin
+        >>> pb = PoiBin(p)
+
+    Be ``x`` a list or NumPy array of different number of successes.
     To obtain:
-        - probability mass function of x, use
-        $ pb.pmf(x)
-        - cumulative distribution function of x, use
-        $ pb.cdf(x)
-        - p-values of x, use
-        $ pb.pval(x)
-    The functions are applied component-wise and a numpy array of the same
-    lenth as x is returned.
+
+    * probability mass function of x, use::
+
+        >>> pb.pmf(x)
+
+    * cumulative distribution function of x, use
+
+        >>> pb.cdf(x)
+
+    * p-values of x, use
+
+        >>> pb.pval(x)
+
+    The functions are applied component-wise and a NumPy array of the same
+    lenth as ``x`` is returned.
 
 Reference:
-    Yili Hong, On computing the distribution function for the Poisson binomial
-    distribution,
+.. [Hong2013] Yili Hong, On computing the distribution function for the Poisson
+    binomial distribution,
     Computational Statistics & Data Analysis, Volume 59, March 2013,
     Pages 41-51, ISSN 0167-9473,
     http://dx.doi.org/10.1016/j.csda.2012.10.006.
@@ -60,38 +72,56 @@ class PoiBin:
 # ------------------------------------------------------------------------------
 
     def pmf(self, kk):
-        """Calculate the probability mass function for the input values kk,
+        """Calculate the probability mass function (pmf) for the input values.
 
+        The pmf is defined as
+
+        .. math::
             pmf(k) = Pr(X = k), k = 0, 1, ..., n.
 
-        :type kk: int or list of integers
+        :param kk: integers for which the pmf is calculated
+        :type kk: int or list of ints
         """
         self.check_rv_input(kk)
         return self.pmf_list[kk]
 
     def cdf(self, kk):
-        """Calculate the cumulative distribution function for the input values
-        kk,
+        """Calculate the cumulative distribution function for the input values.
 
-            cdf(k) = Pr(X <= k), k = 0, 1, ..., n.
+        The cumulative distribution funtion is defined as
 
-        :type kk: int or list of integers
+        .. math::
+
+            cdf(k) = Pr(X \leq k), k = 0, 1, ..., n.
+
+        :param kk: intergers for whch the cdf is calculated.
+        :type kk: int or list of ints
         """
         self.check_rv_input(kk)
         return self.cdf_list[kk]
 
     def pval(self, kk):
-        """Return the p-value corresponding to kk,
+        """Return the p-value corresponding to the input values kk,
 
-            pval(k) = Pr(X >= k ),  k = 0, 1, ..., n.
+        The p-values of right-sided testing are defined as
 
-        NB:
-            Since cdf(k) = Pr(X <= k), the function returns
-            1 - cdf(X < k)
-            = 1 - cdf(X <= k - 1)
-            = 1 - cdf(X <= k) + pmf(X = k), k = 0, 1, .., n.
+        .. math::
 
-        :type kk: int, or numpy.array or list of integers
+            pval(k) = Pr(X \geq k ),  k = 0, 1, ..., n.
+
+        .. note::
+
+            Since :math:`cdf(k) = Pr(X <= k)`, the function returns
+
+            .. math::
+
+                1 - cdf(X < k) & = 1 - cdf(X <= k - 1)
+                               & = 1 - cdf(X <= k) + pmf(X = k),
+
+                               k = 0, 1, .., n.
+
+        :param kk: intergers for whch the cdf is calculated.
+        :type kk: int, or np.array or list of ints
         """
         self.check_rv_input(kk)
         i = 0
