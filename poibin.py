@@ -177,7 +177,7 @@ class PoiBin:
         """Return the value of chi_idx."""
         argz_sum = self.get_argz_sum(idx)
         d = self.get_d(idx)
-        chi = d * (np.cos(argz_sum) + 1j * np.sin(argz_sum))
+        chi = d * np.exp(argz_sum * 1j)
         return chi
 
     def get_argz_sum(self, idx):
