@@ -193,14 +193,13 @@ class PoiBin:
         """Return coefficient d_idx of the chi value
         chi_idx = d_idx * (Real + j * Imag).
         """
-        dum = self.get_z(range(self.n), idx)
+        dum = self.get_z(idx)
         exparg = np.log(np.abs(dum)).sum()
         return np.exp(exparg)
 
-    def get_z(self, j, idx):
+    def get_z(self, idx):
         """Return z_j(l)."""
-        probability = self.p[j]
-        z = 1 - probability + probability * np.exp(self.omega * idx * 1j)
+        z = 1 - self.p + self.p * np.exp(self.omega * idx * 1j)
         return z
 
 # ------------------------------------------------------------------------------
