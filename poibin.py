@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Created on Tue Mar 29, 2016
 
@@ -143,7 +142,6 @@ class PoiBin:
 # ------------------------------------------------------------------------------
 # Methods to obtain pmf and cdf
 # ------------------------------------------------------------------------------
-
     def get_cdf(self, xx):
         """Return a list which contains all the values of the cumulative
         density function for i = 0, 1, ..., n.
@@ -201,8 +199,8 @@ class PoiBin:
 
     def get_z(self, j, idx):
         """Return z_j(l)."""
-        z = 1 - self.p[j] + self.p[j] * np.cos(self.omega * idx) + \
-            1j * self.p[j] * np.sin(self.omega * idx)
+        probability = self.p[j]
+        z = 1 - probability + probability * np.exp(self.omega * idx * 1j)
         return z
 
 # ------------------------------------------------------------------------------
