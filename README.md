@@ -19,7 +19,8 @@ The newest version can be found on
 [https://github.com/tsakim/poibin](https://github.com/tsakim/poibin)
 
 ## Dependencies
-[NumPy](http://www.numpy.org/)
+* [NumPy](http://www.numpy.org/)
+* [pytest](https://docs.pytest.org/en/latest/contents.html) For testing
 
 ## Usage
 Consider `n` independent and non-identically distributed random variables and
@@ -45,18 +46,19 @@ pb.cdf(x)
 pb.pval(x)
 ```
 
-All three methods accept single integers as well as lists/NumPy arrays of integers. Note that `x[i]` must be smaller than `len(p)`.
+All three methods accept single integers as well as lists/NumPy arrays of
+integers. Note that `x[i]` must be smaller than `len(p)`.
 
 ## Testing
-The methods have been implemented using the `doctest` module. To run the tests, execute
+The methods have been implemented using the `pytest` module. To run the tests, execute
 
 ```
-$ python -m doctest poibin_tests.txt
+$ pytest test_poibin.py
 ```
 in the command line. For verbose mode, use
 
 ```
-$ python -m doctest -v poibin_tests.txt
+$ pytest -v test_poibin.py
 ```
 
 ## Reference
@@ -66,4 +68,4 @@ Computational Statistics & Data Analysis, Volume 59, March 2013, pages 41-51,
 ISSN 0167-9473](http://dx.doi.org/10.1016/j.csda.2012.10.006)
 
 ---
-Copyright (c) 2016 Mika J. Straka
+Copyright (c) 2016-2017 Mika J. Straka

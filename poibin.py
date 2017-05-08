@@ -3,7 +3,7 @@
 Created on Tue Mar 29, 2016
 
 Module:
-    poibin - Poisson Binomial distribution
+    poibin - Poisson Binomial Distribution
 
 Author:
     Mika Straka
@@ -43,9 +43,9 @@ Usage:
         >>> pb.pval(x)
 
     The functions are applied component-wise and a NumPy array of the same
-    lenth as ``x`` is returned.
+    length as ``x`` is returned.
 
-Reference:
+References:
 .. [Hong2013] Yili Hong, On computing the distribution function for the Poisson
     binomial distribution,
     Computational Statistics & Data Analysis, Volume 59, March 2013,
@@ -72,11 +72,12 @@ class PoiBin:
 # ------------------------------------------------------------------------------
 
     def pmf(self, kk):
-        """Calculate the probability mass function (pmf) for the input values.
+        """Calculate the probability mass function ``pmf`` for the input values.
 
-        The pmf is defined as
+        The ``pmf`` is defined as
 
         .. math::
+
             pmf(k) = Pr(X = k), k = 0, 1, ..., n.
 
         :param kk: integers for which the pmf is calculated
@@ -88,14 +89,14 @@ class PoiBin:
     def cdf(self, kk):
         """Calculate the cumulative distribution function for the input values.
 
-        The cumulative distribution funtion is defined as
+        The cumulative distribution function ``cdf`` is defined as
 
         .. math::
 
             cdf(k) = Pr(X \leq k), k = 0, 1, ..., n.
 
-        :param kk: intergers for whch the cdf is calculated.
-        :type kk: int or list of ints
+        :param kk: integers for which the cdf is calculated.
+        :type kk: int or list of integers
         """
         self.check_rv_input(kk)
         return self.cdf_list[kk]
@@ -120,8 +121,8 @@ class PoiBin:
 
                                k = 0, 1, .., n.
 
-        :param kk: intergers for whch the cdf is calculated.
-        :type kk: int, or np.array or list of ints
+        :param kk: integers for which the cdf is calculated.
+        :type kk: int, or np.array or list of integers
         """
         self.check_rv_input(kk)
         i = 0
@@ -145,8 +146,10 @@ class PoiBin:
 # ------------------------------------------------------------------------------
 
     def get_cdf(self, xx):
-        """Return a list which contains all the values of the cumulative
-        density function for i = 0, 1, ..., n.
+        """Return the values of the cumulative density function.
+
+        Return a list which contains all the values of the cumulative
+        density function for :math:`i = 0, 1, ..., n`j.
         """
         c = np.empty(self.n + 1)
         c[0] = xx[0]
@@ -155,15 +158,15 @@ class PoiBin:
         return c
 
     def get_pmf_xi(self):
-        """Return the values of xi, which are the components that make up the
-        cumulative distribution function.
+        """Return the values of ``xi``.
+
+        The components ``xi`` make up the probability mass function.
         """
         chi = np.empty(self.n + 1, dtype=complex)
         chi[0] = 1
         half_n = int(self.n / 2 + self.n % 2)
         # set first half of chis:
-        for i in range(1, half_n + 1):
-            chi[i] = self.get_chi(i)
+        chi[1:half_n + 1] = self.get_chi(np.arange(1, half_n + 1))
         # set second half of chis:
         chi[half_n + 1:self.n + 1] = np.conjugate(chi[1:self.n - half_n + 1]
                                                   [::-1])
@@ -175,42 +178,28 @@ class PoiBin:
             raise TypeError("pmf / xi values have to be real.")
         return xi
 
-    def get_chi(self, idx):
-        """Return the value of chi_idx."""
-        argz_sum = self.get_argz_sum(idx)
-        d = self.get_d(idx)
-        chi = d * (np.cos(argz_sum) + 1j * np.sin(argz_sum))
+    def get_chi(self, idx_array):
+        """Return the values of ``chi`` for the specified indices."""
+        # get_z:
+        e = np.exp(self.omega * idx_array * 1j)
+        xy = 1 - self.p + self.p * e[:, np.newaxis]
+        # get__argz_sum:
+        argz_sum = np.arctan2(xy.imag, xy.real).sum(axis=1)
+        # get_d:
+        exparg = np.log(np.abs(xy)).sum(axis=1)
+        d = np.exp(exparg)
+        # get_chi:
+        chi = d * np.exp(argz_sum * 1j)
         return chi
-
-    def get_argz_sum(self, idx):
-        """Sum over all the principal values of z_j(l) for j = 1, ..., n,
-        keeping idx fixed.
-        """
-        y = self.p * np.sin(self.omega * idx)
-        x = 1 - self.p + self.p * np.cos(self.omega * idx)
-        argz = np.arctan2(y, x).sum()
-        return argz
-
-    def get_d(self, idx):
-        """Return coefficient d_idx of the chi value
-        chi_idx = d_idx * (Real + j * Imag).
-        """
-        dum = self.get_z(range(self.n), idx)
-        exparg = np.log(np.abs(dum)).sum()
-        return np.exp(exparg)
-
-    def get_z(self, j, idx):
-        """Return z_j(l)."""
-        z = 1 - self.p[j] + self.p[j] * np.cos(self.omega * idx) + \
-            1j * self.p[j] * np.sin(self.omega * idx)
-        return z
 
 # ------------------------------------------------------------------------------
 # Auxiliary functions
 # ------------------------------------------------------------------------------
 
     def check_rv_input(self, kk):
-        """Check whether input values kk for the random variable are >=0,
+        """Assert that the input values ``kk`` are OK.
+
+        Check that the input values ``kk`` for the random variable are >=0,
         integers and <= n.
         """
         try:
@@ -231,8 +220,9 @@ class PoiBin:
 
     @staticmethod
     def check_xi_are_real(xx):
-        """Check whether all the xis have imaginary part equal to 0, i.e.
-         whether probabilities pmf are positive.
+        """Check whether all the xis have imaginary part equal to 0.
+
+        The probabilities ``pmf`` have to be positive.
         """
         eps = 1e-15  # account for machine precision
         return np.all(xx.imag <= eps)
