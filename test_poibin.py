@@ -42,7 +42,10 @@ from scipy.stats import binom
 # PoiBin.pmf -------------------------------------------------------------------
 
 def test_pmf():
-    """Test the probability mass function and compare with R package [Rpoibin]_.
+    """Test the probability mass function.
+    
+    The outcomes of some results are compared with the poibin R package 
+    [Rpoibin]_.
     """
     p = [1, 1]
     pb = PoiBin(p)
@@ -105,9 +108,9 @@ def test_pmf_accuracy():
     pb = PoiBin(p)
     chi_pb = pb.pmf(k)
     assert np.all(np.around(chi_bn, decimals=10) == np.around(chi_pb,
-        decimals=10))
+                                                              decimals=10))
 
-# PoiBin.cdf -------------------------------------------------------------------
+# PoiBin.cdf ------------------------------------------------------------------
 
 def test_cdf():
     """Test the cumulative distribution function."""
@@ -152,7 +155,7 @@ def test_cdf_accuracy():
                   1e-10)
     p = [0.1, 0.5, 0.7]
     pb = PoiBin(p)
-    assert np.all(np.abs(pb.cdf([0, 1, 2]) == np.array([0.135, 0.6,0.965])) <
+    assert np.all(np.abs(pb.cdf([0, 1, 2]) == np.array([0.135, 0.6, 0.965])) <
                   1e-10)
 
 # PoiBin.pval ------------------------------------------------------------------
@@ -171,7 +174,7 @@ def test_pval_pb_binom():
     as the ones of the Binomial distribution when all the probabilities are
     equal.
     """
-    pi = np.around(np.random.random_sample(), decimals = 2)
+    pi = np.around(np.random.random_sample(), decimals=2)
     ni = np.random.randint(5, 500)
     pp = [pi for i in range(ni)]
     bn = binom(n=ni, p=pi)
@@ -180,15 +183,15 @@ def test_pval_pb_binom():
     pb = PoiBin(pp)
     pval_pb = pb.pval(k)
     assert np.all(np.around(pval_bn, decimals=10) == np.around(pval_pb,
-                  decimals=10))
+                                                               decimals=10))
 
 # PoiBin.get_cdf ---------------------------------------------------------------
 
 def test_get_cdf():
-    """Test that the right cumulatve distribution function is obtained."""
+    """Test that the right cumulative distribution function is obtained."""
     p = [1, 1]
     pb = PoiBin(p)
-    assert np.all(pb.get_cdf([1, 1, 1]) == np.array([ 1.,  2.,  3.]))
+    assert np.all(pb.get_cdf([1, 1, 1]) == np.array([1., 2., 3.]))
 
 # PoiBin.get_pmf_xi ------------------------------------------------------------
 
@@ -196,31 +199,30 @@ def test_get_pmf_xi():
     """Test that the correct pmf elements are obtained."""
     p = [0.2, 0.5]
     pb = PoiBin(p)
-    assert np.all(np.abs(pb.get_pmf_xi() - np.array([ 0.4,  0.5,  0.1])) <
-                1e-10)
+    assert np.all(np.abs(pb.get_pmf_xi() - np.array([0.4, 0.5, 0.1])) <
+                  1e-10)
     p = [0.3, 0.8]
     pb = PoiBin(p)
-    assert np.all(np.abs(pb.get_pmf_xi() - np.array([ 0.14,  0.62,  0.24])) <
-                1e-10)
+    assert np.all(np.abs(pb.get_pmf_xi() - np.array([0.14, 0.62, 0.24])) <
+                  1e-10)
     p = [0.3, 0.8, 0.3]
     pb = PoiBin(p)
-    assert np.all(np.abs(pb.get_pmf_xi() - np.array([ 0.098,  0.476,  0.354,
-                0.072])) < 1e-10)
-
+    assert np.all(np.abs(pb.get_pmf_xi() - np.array([0.098, 0.476, 0.354,
+                                                     0.072])) < 1e-10)
 # PoiBin.check_rv_input --------------------------------------------------------
 
 def test_check_rv_input():
-    """Test that inputs are positive integers."""
+    """Test tat inputs are positive integers."""
     p = [1, 1]
     pb = PoiBin(p)
     assert pb.check_rv_input([1, 2])
     assert pb.check_rv_input(2)
 
     with pytest.raises(AssertionError,
-            message="Input value cannot be negative."):
+                       message="Input value cannot be negative."):
         pb.check_rv_input(-1)
     with pytest.raises(AssertionError,
-            message="Input value must be an integer."):
+                       message="Input value must be an integer."):
         pb.check_rv_input(1.7)
 
 # PoiBin.check_xi_are_real -----------------------------------------------------
@@ -236,14 +238,16 @@ def test_check_xi_are_real():
 # PoiBin.check_input_prob ------------------------------------------------------
 
 def test_check_input_prob():
-    """Test the check that input probabilites are between 0 and 1."""
+    """Test the check that input probabilities are between 0 and 1."""
     with pytest.raises(ValueError,
-            message="Input must be an one-dimensional array or a list."):
+                       message="Input must be an one-dimensional array or a"\
+                                + "list."):
         pb = PoiBin([[1, 1], [1, 2]])
     with pytest.raises(ValueError,
-            message="Input probabilites have to be non negative."):
+                       message="Input probabilities have to be non negative."):
         pb = PoiBin([1, -1])
     with pytest.raises(ValueError,
-            message="Input probabilites have to be smaller than 1."):
+                       message="Input probabilities have to be smaller"\
+                               + "than 1."):
         pb = PoiBin([1, 2])
 
