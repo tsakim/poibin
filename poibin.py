@@ -204,13 +204,14 @@ class PoiBin(object):
             xi = xi.real
         else:
             raise TypeError("pmf / xi values have to be real.")
+        xi += np.finfo(type(xi[0])).eps
         return xi
 
     def get_chi(self, idx_array):
         """Return the values of ``chi`` for the specified indices.
 
         :param idx_array: array of indices for which the ``chi`` values should
-            be calculated 
+            be calculated
         :type idx_array: numpy.array
         """
         # get_z:
@@ -266,8 +267,7 @@ class PoiBin(object):
         :param xi_values: single event probabilities
         :type xi_values: complex
         """
-        eps = 1e-15  # account for machine precision
-        return np.all(xi_values.imag <= eps)
+        return np.all(xi_values.imag <= np.finfo(float).eps)
 
     def check_input_prob(self):
         """Check that all the input probabilities are in the interval [0, 1]."""

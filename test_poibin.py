@@ -43,8 +43,8 @@ from scipy.stats import binom
 
 def test_pmf():
     """Test the probability mass function.
-    
-    The outcomes of some results are compared with the poibin R package 
+
+    The outcomes of some results are compared with the poibin R package
     [Rpoibin]_.
     """
     p = [1, 1]
@@ -116,8 +116,8 @@ def test_cdf():
     """Test the cumulative distribution function."""
     p = [1, 1]
     pb = PoiBin(p)
-    assert np.all(pb.cdf([1, 2]) == np.array([0., 1.]))
-    assert pb.cdf(2) == 1.
+    assert np.all(pb.cdf([1, 2]) - np.array([0., 1.]) < 4 * np.finfo(float).eps)
+    assert (pb.cdf(2) - 1.) < 4 * np.finfo(float).eps
 
 def test_cdf_pb_binom():
     """Compare the cumulative distribution function with the binomial limit
@@ -164,8 +164,10 @@ def test_pval():
     """Test the p-values function."""
     p = [1, 1]
     pb = PoiBin(p)
-    assert np.all(np.around(pb.pval([1, 2]), decimals=2) == np.array([1., 1.]))
-    assert pb.pval(2) == 1.0
+
+    assert np.all(pb.pval([1, 2]) - np.array([1., 1.]) <
+           4 * np.finfo(float).eps)
+    assert (pb.pval(2) - 1.) < 4 * np.finfo(float).eps
 
 def test_pval_pb_binom():
     """Compare the p-values with the binomial limit case.
